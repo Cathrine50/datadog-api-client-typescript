@@ -1,5 +1,5 @@
 {
-  "$schema": "node_modules/@openapitools/openapi-generator-cli/config.schema.json",
+  "$schema": "../node_modules/@openapitools/openapi-generator-cli/config.schema.json",
   "spaces": 2,
   "generator-cli": {
     "version": "5.3.1",
@@ -14,7 +14,7 @@
         "inputSpec": "schemas/v1/openapi.yaml",
         "output": "../packages/datadog-api-client-v1/",
         "typeMappings": "AnyType=any",
-        "additionalProperties": "disallowAdditionalPropertiesIfNotPresent=false,useObjectParameters=true,platform=node",
+        "additionalProperties": "disallowAdditionalPropertiesIfNotPresent=false,useObjectParameters=true,platform=node,supports=es6",
         "globalProperty": "skipFormModel=false",
         "templateDir": "templates"
       },
@@ -24,7 +24,7 @@
         "inputSpec": "schemas/v2/openapi.yaml",
         "output": "../packages/datadog-api-client-v2/",
         "typeMappings": "AnyType=any",
-        "additionalProperties": "disallowAdditionalPropertiesIfNotPresent=false,useObjectParameters=true,platform=node",
+        "additionalProperties": "disallowAdditionalPropertiesIfNotPresent=false,useObjectParameters=true,platform=node,supports=es6",
         "globalProperty": "skipFormModel=false",
         "templateDir": "templates"
       }

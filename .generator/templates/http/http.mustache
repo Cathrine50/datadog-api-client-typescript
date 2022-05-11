@@ -1,4 +1,4 @@
-import { userAgent } from '../../../userAgent';
+import { getUserAgent } from '../../../userAgent';
 {{#platforms}}
 {{#node}}
 // TODO: evaluate if we can easily get rid of this library
@@ -133,7 +133,7 @@ export interface HttpConfiguration {
  * Represents an HTTP request context
  */
 export class RequestContext {
-    private headers: { [key: string]: string } = { 'user-agent': userAgent };
+    private headers: { [key: string]: string } = {};
     private body: RequestBody = undefined;
     private url: URLParse;
     private httpConfig: HttpConfiguration = {};
@@ -145,6 +145,8 @@ export class RequestContext {
      * @param httpMethod http method
      */
     public constructor(url: string, private httpMethod: HttpMethod) {
+        this.generateHeaders();
+
         this.url = new URLParse(url, true);
     }
 
@@ -179,6 +181,14 @@ export class RequestContext {
 
     public getHttpMethod(): HttpMethod {
         return this.httpMethod;
+    }
+
+    private async generateHeaders(): Promise<void> {
+        const userAgent = await getUserAgent();
+
+        this.headers = {
+            "user-agent": userAgent,
+        };
     }
 
     public getHeaders(): { [key: string]: string } {

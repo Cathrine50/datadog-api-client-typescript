@@ -1,16 +1,7 @@
 import { HttpLibrary, HttpConfiguration, RequestContext } from "./http/http";
 import { IsomorphicFetchHttpLibrary as DefaultHttpLibrary } from "./http/isomorphic-fetch";
-import {
-  BaseServerConfiguration,
-  server1,
-  servers,
-  operationServers,
-} from "./servers";
-import {
-  configureAuthMethods,
-  AuthMethods,
-  AuthMethodsConfiguration,
-} from "./auth/auth";
+import { BaseServerConfiguration, server1, servers, operationServers } from "./servers";
+import { configureAuthMethods, AuthMethods, AuthMethodsConfiguration } from "./auth/auth";
 
 export interface Configuration {
   readonly baseServer?: BaseServerConfiguration;
@@ -71,10 +62,8 @@ export interface ConfigurationParameters {
  *
  * @param conf partial configuration
  */
-export function createConfiguration(
-  conf: ConfigurationParameters = {}
-): Configuration {
-  if (process !== undefined && process.env.DD_SITE) {
+export function createConfiguration(conf: ConfigurationParameters = {}): Configuration {
+  if (typeof process !== "undefined" && typeof process?.env?.DD_SITE !== "undefined") {
     const serverConf = server1.getConfiguration();
     server1.setVariables({ site: process.env.DD_SITE } as typeof serverConf);
     for (const op in operationServers) {
@@ -84,19 +73,11 @@ export function createConfiguration(
 
   const authMethods = conf.authMethods || {};
 
-  if (
-    !("apiKeyAuth" in authMethods) &&
-    process !== undefined &&
-    process.env.DD_API_KEY
-  ) {
+  if (!("apiKeyAuth" in authMethods) && typeof process !== "undefined" && typeof process?.env?.DD_API_KEY !== "undefined") {
     authMethods["apiKeyAuth"] = process.env.DD_API_KEY;
   }
 
-  if (
-    !("appKeyAuth" in authMethods) &&
-    process !== undefined &&
-    process.env.DD_APP_KEY
-  ) {
+  if (!("appKeyAuth" in authMethods) && typeof process !== "undefined" && typeof process?.env?.DD_APP_KEY !== "undefined") {
     authMethods["appKeyAuth"] = process.env.DD_APP_KEY;
   }
 
@@ -129,20 +110,12 @@ export function createConfiguration(
   return configuration;
 }
 
-export function getServer(
-  conf: Configuration,
-  endpoint: string
-): BaseServerConfiguration {
+export function getServer(conf: Configuration, endpoint: string): BaseServerConfiguration {
   if (conf.baseServer !== undefined) {
     return conf.baseServer;
   }
-  const index =
-    endpoint in conf.operationServerIndices
-      ? conf.operationServerIndices[endpoint]
-      : conf.serverIndex;
-  return endpoint in operationServers
-    ? operationServers[endpoint][index]
-    : servers[index];
+  const index = endpoint in conf.operationServerIndices ? conf.operationServerIndices[endpoint] : conf.serverIndex;
+  return endpoint in operationServers ? operationServers[endpoint][index] : servers[index];
 }
 
 /**
@@ -150,10 +123,7 @@ export function getServer(
  *
  * @param serverVariables key/value object representing the server variables (site, name, protocol, ...)
  */
-export function setServerVariables(
-  conf: Configuration,
-  serverVariables: { [key: string]: string }
-): void {
+export function setServerVariables(conf: Configuration, serverVariables: { [key: string]: string }): void {
   if (conf.baseServer !== undefined) {
     conf.baseServer.setVariables(serverVariables);
     return;
@@ -170,9 +140,7 @@ export function setServerVariables(
 /**
  * Apply given security authentication method if avaiable in configuration.
  */
-export function applySecurityAuthentication<
-  AuthMethodKey extends keyof AuthMethods
->(
+export function applySecurityAuthentication<AuthMethodKey extends keyof AuthMethods>(
   conf: Configuration,
   requestContext: RequestContext,
   authMethods: AuthMethodKey[]

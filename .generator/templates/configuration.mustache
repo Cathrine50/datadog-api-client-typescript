@@ -71,7 +71,7 @@ export interface ConfigurationParameters {
  * @param conf partial configuration
  */
 export function createConfiguration(conf: ConfigurationParameters = {}): Configuration {
-    if (process !== undefined && process.env.DD_SITE) {
+    if (typeof process !== "undefined" && process?.env?.DD_SITE) {
         let serverConf = server1.getConfiguration();
         server1.setVariables({"site": process.env.DD_SITE} as (typeof serverConf));
         for (const op in operationServers) {

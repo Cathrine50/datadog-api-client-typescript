@@ -1,4 +1,4 @@
-import { userAgent } from "../../../userAgent";
+import { getUserAgent } from "../../../userAgent";
 // TODO: evaluate if we can easily get rid of this library
 import FormData from "form-data";
 import URLParse from "url-parse";
@@ -82,7 +82,7 @@ export interface HttpConfiguration {
  * Represents an HTTP request context
  */
 export class RequestContext {
-  private headers: { [key: string]: string } = { "user-agent": userAgent };
+  private headers: { [key: string]: string } = {};
   private body: RequestBody = undefined;
   private url: URLParse;
   private httpConfig: HttpConfiguration = {};
@@ -94,6 +94,8 @@ export class RequestContext {
    * @param httpMethod http method
    */
   public constructor(url: string, private httpMethod: HttpMethod) {
+    this.generateHeaders();
+
     this.url = new URLParse(url, true);
   }
 
@@ -132,6 +134,12 @@ export class RequestContext {
 
   public getHeaders(): { [key: string]: string } {
     return this.headers;
+  }
+
+  private async generateHeaders(): Promise<void> {
+    const userAgent = await getUserAgent();
+
+    this.setHeaderParam("user-agent", userAgent);
   }
 
   public getBody(): RequestBody {
@@ -190,11 +198,7 @@ export class SelfDecodingBody implements ResponseBody {
 }
 
 export class ResponseContext {
-  public constructor(
-    public httpStatusCode: number,
-    public headers: { [key: string]: string },
-    public body: ResponseBody
-  ) {}
+  public constructor(public httpStatusCode: number, public headers: { [key: string]: string }, public body: ResponseBody) {}
 
   /**
    * Parse header value in the form `value; param1="value1"`
@@ -228,8 +232,7 @@ export class ResponseContext {
 
   public async getBodyAsFile(): Promise<HttpFile> {
     const data = await this.body.binary();
-    const fileName =
-      this.getParsedHeader("content-disposition")["filename"] || "";
+    const fileName = this.getParsedHeader("content-disposition")["filename"] || "";
     return { data, name: fileName };
   }
 }
